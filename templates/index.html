@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Citation lookup</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <link rel="stylesheet" href="http://s3.amazonaws.com/static-heroku-360link/css/normalize.min.css">
+        <link rel="stylesheet" href="http://s3.amazonaws.com/static-heroku-360link/css/main.css">
+
+        <script src="http://s3.amazonaws.com/static-heroku-360link/js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
+
+        <style type="text/css">
+         input#cite {
+            width: 30em;
+            height: 10em;
+         }
+        </style>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+        <![endif]-->
+
+        <div class="header-container">
+            <header class="wrapper clearfix">
+                <h1 class="title">Citation lookup</h1>
+            </header>
+        </div>
+
+        <div class="main-container">
+            <div class="main wrapper clearfix">
+
+                <article>
+                    <header>
+                        <h1>Sample citation lookup</h1>
+                    </header>
+                    <section>
+                        <form id="cite-box">
+                            <textarea rows="15" cols="80" id="text-box"></textarea>
+                        </form>
+                            <div id="spinner" style="display: none;">
+                            <span> 
+                                <img src="https://library.brown.edu/find/interface/themes/brown/images/ajax_loading.gif" alt="Initially hidden spinner" />
+                            </span>
+                        </div>
+                    </section>
+                    <section id="cites">
+                    </section>
+                    <section id="links">
+                    </section>
+                    <footer>
+                    </footer>
+                </article>
+
+                <aside>
+                    <h1>aside</h1>
+                </aside>
+
+            </div> <!-- #main -->
+        </div> <!-- #main-container -->
+
+        <div class="footer-container">
+            <footer class="wrapper">
+            </footer>
+        </div>
+
+        <script type="text/javascript" src="http://library.brown.edu/easyarticle/static/delivery/js/json2.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+        <script src="http://s3.amazonaws.com/static-heroku-360link/js/main.js"></script>
+        <script id="notFoundTemplate" type="text/x-jQuery-tmpl">
+            <h1>Can not locate this citation</h1>
+        </script>
+        {% raw %}
+        <script id="citationsTemplate" type="text/x-jQuery-tmpl">
+            {{if match}}
+                <p>This article has a doi of ${doi}.</p>
+            {{else}}
+                <h1>Can not locate citation</h1>
+            {{/if}}
+        </script>
+        {% endraw %}
+
+        <script id="linkTemplate" type="text/x-jQuery-tmpl">
+            <h1><a href="${link}">${provider}</a></h1>
+        </script>
+        {% raw %}
+        <script id="noHoldingsTemplate" type="text/x-jQuery-tmpl">
+            <p>A full text link can not be found.<br/>
+            <a href="http://library.brown.edu${permalink}">Request via easyArticle</a>.
+            </p>
+        </script>
+        {% endraw %}
+        <script>
+
+            $('textarea').bind('input', function(e) {
+                $pre = $('#cites');
+                //$pre.html("<p>" + $(this).val() + "</p>");
+                findDOI($(this).val());
+                $('#spinner').toggle();
+            }); 
+
+            function findDOI(cite) {
+                var cites = {'citation': cite};
+                console.debug(cites);
+                var cs = JSON.stringify(cites);
+                var jqxhr = $.post("/fetch-cite", cite, function() {
+                  //console.debug(this);
+                })
+                .success(function(data) 
+                    { 
+                        console.debug(data); 
+                        $('#cites').html($('#citationsTemplate').tmpl(data.results));
+                        $.each(data.results, function(num, link) { 
+                          if (link.doi != undefined) {
+                            getElectronicHoldings(link.doi);
+                          };
+
+                        });
+                    }
+                )
+                .error(function() { alert("Error.  This is a toy."); })
+                .complete(function() { $('#spinner').toggle();});
+                return false;
+            };
+
+            //Get holdings from 360link.
+            function getElectronicHoldings(doi) {
+                var ourl = 'doi=' + doi;
+                jsonFetch('http://library.brown.edu/easyarticle/link360/?' + ourl + '&output=json&callback=?', {},process360LinkHoldings);
+            };
+
+            function process360LinkHoldings(holdings) {
+                console.debug(holdings);
+                $('#links').html("<pre>Looking for full text at Brown.</pre>");
+                if (holdings.direct_link != undefined) {
+                    $('#links').html($('#linkTemplate').tmpl(holdings.direct_link));
+                } else {
+                    $('#links').html($('#noHoldingsTemplate').tmpl(holdings));
+                };
+                $('#spinner').hide();
+                return;
+            };
+
+
+            function jsonFetch(url, data, callback) {
+                $('#spinner').show();
+                $.ajax({
+                  url: url,
+                  dataType: 'json',
+                  data: data,
+                  success: callback
+                });
+            };
+
+        </script>
+
+    </body>
+</html>
