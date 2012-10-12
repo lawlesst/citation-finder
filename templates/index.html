@@ -101,8 +101,9 @@
         <script>
 
             $('textarea').bind('input', function(e) {
-                $pre = $('#cites');
-                //$pre.html("<p>" + $(this).val() + "</p>");
+                //clear existing
+                $('#cites').empty();
+                $('#links').empty();
                 findDOI($(this).val());
                 $('#spinner').toggle();
             }); 
