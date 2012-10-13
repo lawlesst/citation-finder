@@ -53,7 +53,9 @@ def fetch_doi(doi):
     if resp.status_code != 200:
         raise Exception("Crossref request failed.  Error code " + str(resp.status_code))
     meta = json.loads(resp.content)
-    #Some doi lookups are failing.  Not sure why.  
+    #Some doi lookups are failing.  Not sure why.
+    #We could also use the CrossRef OpenURL end point to find these:
+    #http://www.crossref.org/openurl/?id=doi:10.1016/0166-0934(91)90005-K&noredirect=true&pid=KEY  
     try:
         first = meta[0]
         return first
@@ -62,18 +64,14 @@ def fetch_doi(doi):
         return {}
 
 if __name__ == "__main__":
-    # d = '10.1021/mp050023q'
-    import urllib
-    d = '10.1002/1099-0690(200105)2001:10<1903::AID-EJOC1903>3.0.CO;2-W'
-    print d
-    scrubbed_d = d.replace('/', '%2F')
-    meta = fetch_doi(scrubbed_d)
+    d = '10.1021/mp050023q'
+    meta = fetch_doi(d)
     print meta.get('doi') == d
     print meta.get('title').rfind('Drugs') > 0
 
-#     cite = """
-# Dendrimers as drugs: discovery and preclinical and clinical development of dendrimer-based microbicides for HIV and STI prevention
-# …, P Karellas, SA Henderson, M Giannis… - Molecular …, 2005 - ACS Publications
-# """
-#     cites = [cite]
-#     pprint(fetch_links(cites))
+    cite = """
+Dendrimers as drugs: discovery and preclinical and clinical development of dendrimer-based microbicides for HIV and STI prevention
+…, P Karellas, SA Henderson, M Giannis… - Molecular …, 2005 - ACS Publications
+"""
+    cites = [cite]
+    pprint(fetch_links(cites))
