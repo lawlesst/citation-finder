@@ -49,7 +49,7 @@ def fetch_links(query):
 def fetch_doi(doi):
     cr = 'http://search.labs.crossref.org/dois'
     #replace / in dois
-    resp = requests.get(cr + '?qdoi:=' + doi)
+    resp = requests.get(cr + '?q=' + doi)
     if resp.status_code != 200:
         raise Exception("Crossref request failed.  Error code " + str(resp.status_code))
     meta = json.loads(resp.content)
@@ -73,5 +73,5 @@ if __name__ == "__main__":
 Dendrimers as drugs: discovery and preclinical and clinical development of dendrimer-based microbicides for HIV and STI prevention
 …, P Karellas, SA Henderson, M Giannis… - Molecular …, 2005 - ACS Publications
 """
-    cites = [cite]
+    cites = cite
     pprint(fetch_links(cites))
