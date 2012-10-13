@@ -28,31 +28,37 @@ def fetch_links(query):
     citations = [cleaned]
     resp = requests.post(cr, data=json.dumps(citations))
     if resp.status_code != 200:
+        print "#ERROR citation lookup failed %s." % cleaned
         raise Exception("Crossref request failed")
     match_dict = json.loads(resp.content)
+    print "#INFO %s." % match_dict
     results = match_dict.get('results')
     ok = match_dict.get('query_ok')
     found = [r for r in results if r.get('match') is True]
-    cite_meta = []
-    #Lookup the DOIs and get metadata for the located citations.  
-    for item in found:
+    if len(found) == 0:
+        cite_meta = []
+    else:
+        #Lookup the DOIs and get metadata for the located citations.  
+        item = found[0]
         doi = item.get('doi')
         meta = fetch_doi(doi)
-        cite_meta.append(meta)
+        cite_meta = [meta]
     out = dict(status=ok, cites=cite_meta)
     return out
 
 def fetch_doi(doi):
     cr = 'http://search.labs.crossref.org/dois'
-    resp = requests.get(cr + '?q=' + doi)
+    #replace / in dois
+    resp = requests.get(cr + '?qdoi:=' + doi)
     if resp.status_code != 200:
-        raise Exception("Crossref request failed.  Error code" + resp.status_code)
+        raise Exception("Crossref request failed.  Error code " + str(resp.status_code))
     meta = json.loads(resp.content)
     #Some doi lookups are failing.  Not sure why.  
     try:
         first = meta[0]
         return first
     except IndexError:
+        print "#ERROR DOI lookup failed for %s." % doi
         return {}
 
 if __name__ == "__main__":
