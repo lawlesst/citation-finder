@@ -84,15 +84,18 @@
         <script src="http://s3.amazonaws.com/static-heroku-360link/js/main.js"></script>
         {% raw %}
         <script id="citationsTemplate" type="text/x-jQuery-tmpl">
-                <h5>Citation</h5>
+                <h5>Citation - <a href="#" id="clear-cite">clear citation/find new citation</a></h5>
                  <hr/>
-                <p>{{html fullCitation}}</p>
+                <p id="found-citation">{{html fullCitation}}</p>
                 <ul>
                 <li><a href="http://dx.doi.org/${doi}">http://dx.doi.org/${doi}</a></li>
-                <!---<li><a href="http://worldcatlibraries.org/registry/gateway?${coins}">Find via Worldcat</a></li>---?
+                <!---<li><a href="http://worldcatlibraries.org/registry/gateway?${coins}">Find via Worldcat</a></li>-->
                 <li>
                     <a title="Add this article to your Mendeley library" href="http://www.mendeley.com/import/?doi=${doi}"><img src="http://www.mendeley.com/graphics/mendeley.png"/></a>&nbsp;&nbsp;
                     <a title="Add this article to your RefWorks library" href=" http://www.refworks.com/express/expressimport.asp?${coins}"><img src="http://www.refworks.com/favicon.ico"/></a>
+                </li>
+                <li>
+                    Google Scholar: <a href="http://scholar.google.com/scholar?cites=http://dx.doi.org/${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?related=http://dx.doi.org/${doi}">related articles</a>
                 </li>
                 </ul>
                 <span class="Z3988" title="${coins}"></span>
@@ -132,11 +135,17 @@
         <script>
 
             $('textarea').bind('input', function(e) {
-                //clear existing
-                $('#cites').empty();
-                $('#links').empty();
                 var query = jQuery.trim($(this).val());
                 var queryWordLength = query.split(/\s+/).length;
+                //If we have a citation on the page.  Don't do anything unless query is "".
+                if ($('#found-citation').length ) {
+                    if (query == '') {
+                        clearFound();
+                    } else {
+                        return false;
+                    };
+                };
+                clearFound();
                 //console.log(query + '--' + queryWordLength);
                // console.log(query.length);
                 //Don't execute blank queries or those less than n characters.
@@ -145,12 +154,13 @@
                 if ((query == '') || (query.length < 25) || (queryWordLength < 3)) {
 
                 } else {
-                    findDOI(query);
-                    $('#spinner').toggle();
+                    setTimeout(findDOI(query), 2000);
                 };
             }); 
 
+
             function findDOI(cite) {
+                $('#spinner').toggle();
                 var cites = {'citation': cite};
                 //console.debug(cites);
                 var cs = JSON.stringify(cites);
@@ -187,6 +197,13 @@
                 })
                 .complete(function() { });
                 return false;
+            };
+
+            //clear existing
+            function clearFound() {
+                //clear existing
+                $('#cites').empty();
+                $('#links').empty();
             };
 
             //Get holdings from 360link.
