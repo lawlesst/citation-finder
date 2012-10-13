@@ -20,6 +20,17 @@
             width: 30em;
             height: 10em;
          }
+         .not-found {
+            border: .25em solid #EE7600;
+         }
+         .not-found em {
+            padding: 1em;
+         }
+         .main-container {
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+         }
         </style>
     </head>
     <body>
@@ -29,7 +40,7 @@
 
         <div class="header-container">
             <header class="wrapper clearfix">
-                <h1 class="title">Citation lookup</h1>
+                <h1 class="title">Citation finder</h1>
             </header>
         </div>
 
@@ -37,30 +48,26 @@
             <div class="main wrapper clearfix">
 
                 <article>
-                    <header>
-                        <h1>Sample citation lookup</h1>
-                    </header>
                     <section>
+                        <!--<pre>
+                            <p>Paste a citation in the box below.  A query will be made to CrossRef to attempt to find a DOI for the citation.  A second query will be made to a link resolver to attempt to find a full text link for the citation.</p>
+                        </pre> -->
                         <form id="cite-box">
-                            <textarea rows="15" cols="80" id="text-box"></textarea>
+                            <textarea rows="10" cols="70" id="text-box"></textarea>
                         </form>
-                            <div id="spinner" style="display: none;">
-                            <span> 
-                                <img src="https://library.brown.edu/find/interface/themes/brown/images/ajax_loading.gif" alt="Initially hidden spinner" />
-                            </span>
-                        </div>
                     </section>
                     <section id="cites">
                     </section>
                     <section id="links">
                     </section>
+                    <section>
+                        <div id="spinner" style="display: none;">
+                                <img src="https://library.brown.edu/find/interface/themes/brown/images/ajax_loading.gif" alt="Initially hidden spinner" />
+                        </div>
+                    </section>
                     <footer>
                     </footer>
                 </article>
-
-                <aside>
-                    <h1>aside</h1>
-                </aside>
 
             </div> <!-- #main -->
         </div> <!-- #main-container -->
@@ -75,27 +82,49 @@
         <script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="http://s3.amazonaws.com/static-heroku-360link/js/main.js"></script>
-        <script id="notFoundTemplate" type="text/x-jQuery-tmpl">
-            <h1>Can not locate this citation</h1>
-        </script>
         {% raw %}
         <script id="citationsTemplate" type="text/x-jQuery-tmpl">
-            {{if match}}
-                <p>This article has a doi of ${doi}.</p>
-            {{else}}
-                <h1>Can not locate citation</h1>
-            {{/if}}
+                <h5>Citation</h5>
+                 <hr/>
+                <p>{{html fullCitation}}</p>
+                <ul>
+                <li><a href="http://dx.doi.org/${doi}">http://dx.doi.org/${doi}</a></li>
+                <li><a href="http://worldcatlibraries.org/registry/gateway?${coins}">Find via Worldcat</a></li>
+                <li><a title="Add this article to your Mendeley library" href="http://www.mendeley.com/import/?doi=${doi}">Add to Mendeley</a>&nbsp;<img src="http://www.mendeley.com/graphics/mendeley.png"/></li>
+                <li><a title="Add this article to your RefWorks library" href=" http://www.refworks.com/express/expressimport.asp?${coins}">Add to RefWorks</a>&nbsp;<img src="http://www.refworks.com/favicon.ico"/></li>
+                </ul>
+                <span class="Z3988" title="${coins}"></span>
+        </script>
+        {% endraw %}
+
+        {% raw %}
+        <script id="notFoundTemplate" type="text/x-jQuery-tmpl">
+             <hr/>
+            <p class="not-found">
+                <em>No citation found.  <a href="http://scholar.google.com/scholar?q=${cite}">Try Google Scholar</a>?</em>
+            </p>
         </script>
         {% endraw %}
 
         <script id="linkTemplate" type="text/x-jQuery-tmpl">
-            <h1><a href="${link}">${provider}</a></h1>
+             <hr/>
+            <h5>Brown University access</h5>
+            <p>Full text available from <a href="${url.article}">
+                ${holdingData.providerName}</a>
+            </p>
         </script>
         {% raw %}
         <script id="noHoldingsTemplate" type="text/x-jQuery-tmpl">
-            <p>A full text link can not be found.<br/>
-            <a href="http://library.brown.edu${permalink}">Request via easyArticle</a>.
+            <h5>Brown University</h5>
+             <hr/>
+            <p>A full text link can not be found.  <a href="http://library.brown.edu/easyarticle/?${openurl}">Request via easyArticle</a>.
             </p>
+        </script>
+        {% endraw %}
+        {% raw %}
+        <script id="lookupErrorTemplate" type="text/x-jQuery-tmpl">
+             <hr/>
+            <p class="error">Error searching the API.</p>
         </script>
         {% endraw %}
         <script>
@@ -104,49 +133,82 @@
                 //clear existing
                 $('#cites').empty();
                 $('#links').empty();
-                findDOI($(this).val());
-                $('#spinner').toggle();
+                var query = jQuery.trim($(this).val());
+                var queryWordLength = query.split(/\s+/).length;
+                //console.log(query + '--' + queryWordLength);
+               // console.log(query.length);
+                //Don't execute blank queries or those less than n characters.
+                //(query.length < 50) || 
+                //CrossRef also wants a minimum of three words in the query. 
+                if ((query == '') || (query.length < 25) || (queryWordLength < 3)) {
+
+                } else {
+                    findDOI(query);
+                    $('#spinner').toggle();
+                };
             }); 
 
             function findDOI(cite) {
                 var cites = {'citation': cite};
-                console.debug(cites);
+                //console.debug(cites);
                 var cs = JSON.stringify(cites);
                 var jqxhr = $.post("/fetch-cite", cite, function() {
                   //console.debug(this);
                 })
                 .success(function(data) 
                     { 
-                        console.debug(data); 
-                        $('#cites').html($('#citationsTemplate').tmpl(data.results));
-                        $.each(data.results, function(num, link) { 
-                          if (link.doi != undefined) {
-                            getElectronicHoldings(link.doi);
-                          };
-
-                        });
+                        //console.debug(data.cites);
+                        //console.debug(data.cites.length);
+                        //console.debug(data.cites[0]);
+                        //not found
+                        if ((data.cites.length == undefined) || (data.cites.length == 0)) {
+                            //render not found
+                            $('#cites').html($('#notFoundTemplate').tmpl({'cite':cite}));
+                            $('#spinner').toggle();
+                        } else {
+                            $.each(data.cites, function(num, link) { 
+                              if (link.doi == undefined) {
+                                  $('#cites').html($('#notFoundTemplate').tmpl({'cite':cite}));
+                                  $('#spinner').toggle();
+                                  return false;
+                              } else {
+                                  $('#cites').html($('#citationsTemplate').tmpl(data.cites));
+                                  getElectronicHoldings(link.doi);
+                              };
+                            });
+                        };
                     }
                 )
-                .error(function() { alert("Error.  This is a toy."); })
-                .complete(function() { $('#spinner').toggle();});
+                .error(function() { 
+                    $('#cites').html($('#lookupErrorTemplate').tmpl());
+                    $('#spinner').toggle();
+                })
+                .complete(function() { });
                 return false;
             };
 
             //Get holdings from 360link.
             function getElectronicHoldings(doi) {
                 var ourl = 'doi=' + doi;
-                jsonFetch('http://library.brown.edu/easyarticle/link360/?' + ourl + '&output=json&callback=?', {},process360LinkHoldings);
+                jsonFetch('http://damp-tor-3124.herokuapp.com/?' + ourl + '&output=json&callback=?', {},process360LinkHoldings);
             };
 
             function process360LinkHoldings(holdings) {
-                console.debug(holdings);
+                var held = false;
                 $('#links').html("<pre>Looking for full text at Brown.</pre>");
-                if (holdings.direct_link != undefined) {
-                    $('#links').html($('#linkTemplate').tmpl(holdings.direct_link));
-                } else {
+                $.each(holdings.links, function(num, link) {
+                    if ((link.url != undefined) && (link.url.article != undefined)) {
+                        $('#links').html($('#linkTemplate').tmpl(link));
+                        $('#spinner').hide();
+                        held = true;
+                        return false;
+                    };
+                });
+                //not held
+                if (held == false) {
                     $('#links').html($('#noHoldingsTemplate').tmpl(holdings));
                 };
-                $('#spinner').hide();
+                
                 return;
             };
 

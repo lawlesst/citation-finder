@@ -9,16 +9,14 @@ from crossref import fetch_links
 app = Flask(__name__)
 
 @app.route('/')
-@app.route('/<name>')
-def index(name=None):
-    return render_template('index.html', name=name)
+def index():
+    return render_template('index.html')
 
 @app.route('/fetch-cite', methods=['POST'])
 def fetch_cite():
     if request.method == 'POST':
-        #cr = json.loads(requests.post(cr, data=).content)
-        cites = [request.form.items()[0][0]]
-        results = fetch_links(cites)
+        cite = request.form.items()[0][0]
+        results = fetch_links(cite)
         return jsonify(results)
 
 if __name__ == '__main__':
