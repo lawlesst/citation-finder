@@ -206,6 +206,11 @@
                 $('#links').empty();
             };
 
+            //clear results when new citation is pated.
+            $("textarea").bind('paste', function(e) {
+                clearFound();
+            });
+
             //Get holdings from 360link.
             function getElectronicHoldings(doi) {
                 var ourl = 'doi=' + doi;
