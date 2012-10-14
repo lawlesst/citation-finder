@@ -16,6 +16,11 @@
         <script src="http://s3.amazonaws.com/static-heroku-360link/js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
 
         <style type="text/css">
+        body {
+            font-family:'Gill Sans','Gill Sans MT','Goudy Bookletter 1911','Linux Libertine O','Liberation Serif',Candara,serif;
+            font-size: 18px;
+            line-height: 1.4em;
+        }
          input#cite {
             width: 30em;
             height: 10em;
@@ -35,8 +40,19 @@
             display: none;
          }
          .intro {
-            
          }
+         .header-container,
+            .main aside {
+                -webkit-box-shadow: none;
+                   -moz-box-shadow: none;
+                        box-shadow: none;
+            }
+        .main {
+            .padding: 0;
+        }
+        h5 {
+            margin: 0em;
+        }
         </style>
     </head>
     <body>
@@ -53,11 +69,6 @@
         <div class="main-container">
             <div class="main wrapper clearfix">
                 <article>
-                    <section>
-                        <p class="intro">Paste a citation in the box below.  A query will be made to CrossRef to attempt to find a DOI for the citation.  A second query will be made to a link resolver to attempt to find a full text link for the citation.</p>
-                        <form id="cite-box">
-                            <textarea rows="7" cols="70" id="text-box"></textarea>
-                        </form>
                     </section>
                     <section id="cites">
                     </section>
@@ -67,6 +78,12 @@
                         <div id="spinner" style="display: none;">
                                 <img src="https://library.brown.edu/find/interface/themes/brown/images/ajax_loading.gif" alt="Initially hidden spinner" />
                         </div>
+                    </section>
+                    <section>
+                        <form id="cite-box">
+                            <textarea rows="7" cols="70" id="text-box"></textarea>
+                        </form>
+                        <p class="intro">Paste a citation in the box above.  A query will be made to CrossRef to attempt to find a DOI for the citation.  A second query will be made to a link resolver to attempt to find a full text link for the citation.  Clear the box or paste a new citation to start over.  This demo uses the <a href="http://search.labs.crossref.org/help/api">CrossRef metadata search.</p>
                     </section>
                     <footer>
                     </footer>
@@ -98,7 +115,7 @@
                 <li><a href="http://dx.doi.org/${doi}">http://dx.doi.org/${doi}</a></li>
                 <!---<li><a href="http://worldcatlibraries.org/registry/gateway?${coins}">Find via Worldcat</a></li>-->
                 <li>
-                    Google Scholar: <a href="http://scholar.google.com/scholar?cites=http://dx.doi.org/${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?q=related=http://dx.doi.org/${doi}">related articles</a>
+                    Google Scholar: <a href="http://scholar.google.com/scholar?cites=http://dx.doi.org/${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?q=related:http://dx.doi.org/${doi}">related articles</a>
                 </li>
                 <li>
                     <a title="Add this article to your Mendeley library" href="http://www.mendeley.com/import/?doi=${doi}"><img src="http://www.mendeley.com/graphics/mendeley.png"/></a>&nbsp;&nbsp;
@@ -125,18 +142,21 @@
             <p>Full text available from <a href="${url.article}">
                 ${holdingData.providerName}</a>
             </p>
+            <hr/>
         </script>
         {% raw %}
         <script id="noHoldingsTemplate" type="text/x-jQuery-tmpl">
              <hr/>
             <p>A full text link can not be found.  Brown University users can <a href="http://library.brown.edu/easyarticle/?${openurl}">request via easyArticle</a>.
             </p>
+            <hr/>
         </script>
         {% endraw %}
         {% raw %}
         <script id="lookupErrorTemplate" type="text/x-jQuery-tmpl">
              <hr/>
             <p class="error">Error searching the API.</p>
+            <hr/>
         </script>
         {% endraw %}
         <script>
