@@ -31,6 +31,12 @@
             margin-left: auto;
             margin-right: auto;
          }
+         #library-code {
+            display: none;
+         }
+         .intro {
+            
+         }
         </style>
     </head>
     <body>
@@ -46,14 +52,11 @@
 
         <div class="main-container">
             <div class="main wrapper clearfix">
-
                 <article>
                     <section>
-                        <!--<pre>
-                            <p>Paste a citation in the box below.  A query will be made to CrossRef to attempt to find a DOI for the citation.  A second query will be made to a link resolver to attempt to find a full text link for the citation.</p>
-                        </pre> -->
+                        <p class="intro">Paste a citation in the box below.  A query will be made to CrossRef to attempt to find a DOI for the citation.  A second query will be made to a link resolver to attempt to find a full text link for the citation.</p>
                         <form id="cite-box">
-                            <textarea rows="10" cols="70" id="text-box"></textarea>
+                            <textarea rows="7" cols="70" id="text-box"></textarea>
                         </form>
                     </section>
                     <section id="cites">
@@ -68,6 +71,10 @@
                     <footer>
                     </footer>
                 </article>
+                {% if library %}
+                <span id="library-code">{{ library }}</span>
+                {% endif %}
+
 
             </div> <!-- #main -->
         </div> <!-- #main-container -->
@@ -91,7 +98,7 @@
                 <li><a href="http://dx.doi.org/${doi}">http://dx.doi.org/${doi}</a></li>
                 <!---<li><a href="http://worldcatlibraries.org/registry/gateway?${coins}">Find via Worldcat</a></li>-->
                 <li>
-                    Google Scholar: <a href="http://scholar.google.com/scholar?cites=http://dx.doi.org/${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?related=http://dx.doi.org/${doi}">related articles</a>
+                    Google Scholar: <a href="http://scholar.google.com/scholar?cites=http://dx.doi.org/${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?q=related=http://dx.doi.org/${doi}">related articles</a>
                 </li>
                 <li>
                     <a title="Add this article to your Mendeley library" href="http://www.mendeley.com/import/?doi=${doi}"><img src="http://www.mendeley.com/graphics/mendeley.png"/></a>&nbsp;&nbsp;
@@ -114,16 +121,15 @@
 
         <script id="linkTemplate" type="text/x-jQuery-tmpl">
              <hr/>
-            <h5>Brown University access</h5>
+            <h5>${library} access</h5>
             <p>Full text available from <a href="${url.article}">
                 ${holdingData.providerName}</a>
             </p>
         </script>
         {% raw %}
         <script id="noHoldingsTemplate" type="text/x-jQuery-tmpl">
-            <h5>Brown University</h5>
              <hr/>
-            <p>A full text link can not be found.  <a href="http://library.brown.edu/easyarticle/?${openurl}">Request via easyArticle</a>.
+            <p>A full text link can not be found.  Brown University users can <a href="http://library.brown.edu/easyarticle/?${openurl}">request via easyArticle</a>.
             </p>
         </script>
         {% endraw %}
@@ -215,14 +221,20 @@
             //Get holdings from 360link.
             function getElectronicHoldings(doi) {
                 var ourl = 'doi=' + doi;
-                jsonFetch('http://damp-tor-3124.herokuapp.com/?' + ourl + '&output=json&callback=?', {},process360LinkHoldings);
+                var libCode = $('#library-code').text();
+                var baseResolver = 'http://damp-tor-3124.herokuapp.com/';
+                if (libCode !== '') {
+                    baseResolver = baseResolver + libCode + '/';
+                };
+                jsonFetch(baseResolver + '?' + ourl + '&output=json&callback=?', {},process360LinkHoldings);
             };
 
             function process360LinkHoldings(holdings) {
                 var held = false;
-                $('#links').html("<pre>Looking for full text at Brown.</pre>");
                 $.each(holdings.links, function(num, link) {
                     if ((link.url != undefined) && (link.url.article != undefined)) {
+                        //add library
+                        link['library'] = holdings.library;
                         $('#links').html($('#linkTemplate').tmpl(link));
                         $('#spinner').hide();
                         held = true;

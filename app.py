@@ -8,9 +8,10 @@ from crossref import fetch_links
 
 app = Flask(__name__)
 
+@app.route('/<library>/')
 @app.route('/')
-def index():
-    return render_template('index.html')
+def index(library=None):
+    return render_template('index.html', library=library)
 
 @app.route('/fetch-cite', methods=['POST'])
 def fetch_cite():
