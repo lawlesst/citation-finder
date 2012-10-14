@@ -32,10 +32,8 @@
             padding: 1em;
          }
          .main-container {
-            width: 90%;
-            margin-left: auto;
-            margin-right: auto;
          }
+         
          #library-code {
             display: none;
          }
@@ -52,6 +50,9 @@
         }
         h5 {
             margin: 0em;
+        }
+        #disqus_thread {
+            margin-top: 4em;
         }
         </style>
     </head>
@@ -85,13 +86,28 @@
                         </form>
                         <p class="intro">Paste a citation in the box above.  A query will be made to CrossRef to attempt to find a DOI for the citation.  A second query will be made to a link resolver to attempt to find a full text link for the citation.  Clear the box or paste a new citation to start over.  This demo uses the <a href="http://search.labs.crossref.org/help/api">CrossRef metadata search.</p>
                     </section>
+                    <section>
+                        <div id="disqus_thread"></div>
+                        <script type="text/javascript">
+                            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                            var disqus_shortname = 'citationfinderdemo'; // required: replace example with your forum shortname
+
+                            /* * * DON'T EDIT BELOW THIS LINE * * */
+                            (function() {
+                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                            })();
+                        </script>
+                        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                    </section>
                     <footer>
                     </footer>
                 </article>
                 {% if library %}
                 <span id="library-code">{{ library }}</span>
                 {% endif %}
-
 
             </div> <!-- #main -->
         </div> <!-- #main-container -->
@@ -129,10 +145,10 @@
 
         {% raw %}
         <script id="notFoundTemplate" type="text/x-jQuery-tmpl">
-             <hr/>
             <p class="not-found">
                 <em>No citation found.  <a href="http://scholar.google.com/scholar?q=${cite}">Try Google Scholar</a>?</em>
             </p>
+             <hr/>
         </script>
         {% endraw %}
 
