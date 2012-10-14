@@ -33,7 +33,7 @@
          }
          .main-container {
          }
-         
+
          #library-code {
             display: none;
          }
@@ -52,7 +52,7 @@
             margin: 0em;
         }
         #disqus_thread {
-            margin-top: 4em;
+            margin-top: 6em;
         }
         </style>
     </head>
@@ -122,6 +122,7 @@
         <script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.2.min.js"><\/script>')</script>
         <script src="http://s3.amazonaws.com/static-heroku-360link/js/main.js"></script>
+        <!-- jQuery templates -->
         {% raw %}
         <script id="citationsTemplate" type="text/x-jQuery-tmpl">
                 <h5>Citation</h5>
@@ -141,17 +142,13 @@
                 </ul>
                 <span class="Z3988" title="${coins}"></span>
         </script>
-        {% endraw %}
 
-        {% raw %}
         <script id="notFoundTemplate" type="text/x-jQuery-tmpl">
             <p class="not-found">
                 <em>No citation found.  <a href="http://scholar.google.com/scholar?q=${cite}">Try Google Scholar</a>?</em>
             </p>
              <hr/>
         </script>
-        {% endraw %}
-
         <script id="linkTemplate" type="text/x-jQuery-tmpl">
              <hr/>
             <h5>${library} access</h5>
@@ -160,23 +157,20 @@
             </p>
             <hr/>
         </script>
-        {% raw %}
         <script id="noHoldingsTemplate" type="text/x-jQuery-tmpl">
              <hr/>
             <p>A full text link can not be found.  Brown University users can <a href="http://library.brown.edu/easyarticle/?${openurl}">request via easyArticle</a>.
             </p>
             <hr/>
         </script>
-        {% endraw %}
-        {% raw %}
         <script id="lookupErrorTemplate" type="text/x-jQuery-tmpl">
              <hr/>
             <p class="error">Error searching the API.</p>
             <hr/>
         </script>
         {% endraw %}
+         <!-- end jQuery templates -->
         <script>
-
             $('textarea').bind('input', function(e) {
                 var query = jQuery.trim($(this).val());
                 var queryWordLength = query.split(/\s+/).length;
