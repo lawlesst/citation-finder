@@ -6,7 +6,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Citation lookup</title>
+        <title>Citation finder</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
@@ -84,19 +84,20 @@
         <script src="http://s3.amazonaws.com/static-heroku-360link/js/main.js"></script>
         {% raw %}
         <script id="citationsTemplate" type="text/x-jQuery-tmpl">
-                <h5>Citation - <a href="#" id="clear-cite">clear citation/find new citation</a></h5>
+                <h5>Citation</h5>
                  <hr/>
                 <p id="found-citation">{{html fullCitation}}</p>
                 <ul>
                 <li><a href="http://dx.doi.org/${doi}">http://dx.doi.org/${doi}</a></li>
                 <!---<li><a href="http://worldcatlibraries.org/registry/gateway?${coins}">Find via Worldcat</a></li>-->
                 <li>
+                    Google Scholar: <a href="http://scholar.google.com/scholar?cites=http://dx.doi.org/${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?related=http://dx.doi.org/${doi}">related articles</a>
+                </li>
+                <li>
                     <a title="Add this article to your Mendeley library" href="http://www.mendeley.com/import/?doi=${doi}"><img src="http://www.mendeley.com/graphics/mendeley.png"/></a>&nbsp;&nbsp;
                     <a title="Add this article to your RefWorks library" href=" http://www.refworks.com/express/expressimport.asp?${coins}"><img src="http://www.refworks.com/favicon.ico"/></a>
                 </li>
-                <li>
-                    Google Scholar: <a href="http://scholar.google.com/scholar?cites=http://dx.doi.org/${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?related=http://dx.doi.org/${doi}">related articles</a>
-                </li>
+                
                 </ul>
                 <span class="Z3988" title="${coins}"></span>
         </script>
