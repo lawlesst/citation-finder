@@ -130,11 +130,8 @@
         <!-- jQuery templates -->
         {% raw %}
         <script id="citationsTemplate" type="text/x-jQuery-tmpl">
-                <h5>Citation</h5>
-                 <hr/>
                 <p id="found-citation">{{html fullCitation}}</p>
                 <ul>
-                <li><a href="http://dx.doi.org/${doi}">http://dx.doi.org/${doi}</a></li>
                 <!---<li><a href="http://worldcatlibraries.org/registry/gateway?${coins}">Find via Worldcat</a></li>-->
                 <li>
                     Google Scholar: <a href="http://scholar.google.com/scholar?cites=http://dx.doi.org/${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?q=related:http://dx.doi.org/${doi}">related articles</a>
@@ -143,7 +140,7 @@
                     <a title="Add this article to your Mendeley library" href="http://www.mendeley.com/import/?doi=${doi}"><img src="http://www.mendeley.com/graphics/mendeley.png"/></a>&nbsp;&nbsp;
                     <a title="Add this article to your RefWorks library" href=" http://www.refworks.com/express/expressimport.asp?${coins}"><img src="http://www.refworks.com/favicon.ico"/></a>
                 </li>
-                
+                <li><a href="http://dx.doi.org/${doi}">http://dx.doi.org/${doi}</a></li>
                 </ul>
                 <span class="Z3988" title="${coins}"></span>
         </script>
@@ -191,7 +188,6 @@
                 //console.log(query + '--' + queryWordLength);
                // console.log(query.length);
                 //Don't execute blank queries or those less than n characters.
-                //(query.length < 50) || 
                 //CrossRef also wants a minimum of three words in the query. 
                 if ((query == '') || (query.length < 25) || (queryWordLength < 3)) {
 
@@ -261,6 +257,7 @@
                 if (libCode !== '') {
                     baseResolver = baseResolver + libCode + '/';
                 };
+                //Should add logic to detect when link resolver fails.
                 jsonFetch(baseResolver + '?' + ourl + '&output=json&callback=?', {},process360LinkHoldings);
             };
 
