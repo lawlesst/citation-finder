@@ -101,7 +101,7 @@
                             (function() {
                                 var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
                                 dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                               (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
                             })();
                         </script>
                         <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
@@ -253,7 +253,8 @@
             function getElectronicHoldings(doi) {
                 var ourl = 'doi=' + doi;
                 var libCode = $('#library-code').text();
-                var baseResolver = 'http://damp-tor-3124.herokuapp.com/';
+		//var baseResolver = 'http://damp-tor-3124.herokuapp.com/';
+		var baseResolver = '/resolve/';
                 if (libCode !== '') {
                     baseResolver = baseResolver + libCode + '/';
                 };
@@ -261,18 +262,17 @@
                 jsonFetch(baseResolver + '?' + ourl + '&output=json&callback=?', {},process360LinkHoldings);
             };
 
-            function process360LinkHoldings(holdings) {
-                var held = false;
-                $.each(holdings.links, function(num, link) {
-                    if ((link.url != undefined) && (link.url.article != undefined)) {
+	    function process360LinkHoldings(holdings) {
+		console.log(holdings)
+		var held = false;
+		if (holdings.url != undefined) {
                         //add library
-                        link['library'] = holdings.library;
-                        $('#links').html($('#linkTemplate').tmpl(link));
+			link['library'] = holdings.library;
+			console.log(holdings.url);
+                        $('#links').html($('#linkTemplate').tmpl(holdings.url));
                         $('#spinner').hide();
                         held = true;
-                        return false;
-                    };
-                });
+                };
                 //not held
                 if (held == false) {
                     $('#links').html($('#noHoldingsTemplate').tmpl(holdings));

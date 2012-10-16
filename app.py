@@ -6,12 +6,9 @@ from flask import render_template
 
 from crossref import fetch_links
 
-app = Flask(__name__)
+default_sersol_key = 'rl3tp7zf5x'
 
-@app.route('/<library>/')
-@app.route('/')
-def index(library=None):
-    return render_template('index.html', library=library)
+app = Flask(__name__)
 
 @app.route('/fetch-cite', methods=['POST'])
 def fetch_cite():
@@ -19,6 +16,47 @@ def fetch_cite():
         cite = request.form.items()[0][0]
         results = fetch_links(cite)
         return jsonify(results)
+
+
+@app.route('/resolve/<key>', methods=['GET'])
+@app.route('/resolve/', methods=['GET'])
+def resolve():
+    from py360link import get_sersol_data, Resolved
+    from py360link.link360 import Link360Exception
+    query = request.query_string
+    try:
+	key = key
+    except UnboundLocalError:
+	key = default_sersol_key
+    if not key:
+	key = default_sersol_key
+    d = {}
+    d['key'] = key
+    d['library'] = None 
+    #d['args'] = request.args
+    #d['sersol'] = sersol
+    d['url'] = None
+    sersol = get_sersol_data(query, key=key, timeout=10)
+    try:
+	resolved = Resolved(sersol)
+	d['library'] = resolved.library
+        for link in resolved.link_groups:
+	    article = link['url'].get('article')
+	    if article:
+		d['url'] = article
+		break
+    except Link360Exception:
+	print '#ERRROR 360Link %s' % query
+	pass
+    d['query'] = query
+    return jsonify(d)
+
+@app.route('/<library>/')
+@app.route('/')
+def index(library=None):
+    return render_template('index.html', library=library)
+
+
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
