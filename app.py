@@ -36,14 +36,17 @@ def resolve():
     #d['args'] = request.args
     #d['sersol'] = sersol
     d['url'] = None
+    d['provider'] = None
     sersol = get_sersol_data(query, key=key, timeout=10)
     try:
 	resolved = Resolved(sersol)
 	d['library'] = resolved.library
-        for link in resolved.link_groups:
+	groups = resolved.link_groups
+        for grp, link in enumerate(groups):
 	    article = link['url'].get('article')
 	    if article:
 		d['url'] = article
+		d['provider'] = groups[grp]['holdingData']['providerName']
 		break
     except Link360Exception:
 	print '#ERRROR 360Link %s' % query

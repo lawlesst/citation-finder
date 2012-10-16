@@ -154,14 +154,14 @@
         <script id="linkTemplate" type="text/x-jQuery-tmpl">
              <hr/>
             <h5>${library} access</h5>
-            <p>Full text available from <a href="${url.article}">
-                ${holdingData.providerName}</a>
+            <p>Full text available from <a href="${url}">
+                ${provider}</a>
             </p>
             <hr/>
         </script>
         <script id="noHoldingsTemplate" type="text/x-jQuery-tmpl">
              <hr/>
-            <p>A full text link can not be found.  Brown University users can <a href="http://library.brown.edu/easyarticle/?${openurl}">request via easyArticle</a>.
+            <p>A full text link can not be found.  Brown University users can <a href="http://library.brown.edu/easyarticle/?${query}">request via easyArticle</a>.
             </p>
             <hr/>
         </script>
@@ -254,44 +254,27 @@
                 var ourl = 'doi=' + doi;
                 var libCode = $('#library-code').text();
 		//var baseResolver = 'http://damp-tor-3124.herokuapp.com/';
-		var baseResolver = '/resolve/';
+		var baseResolver = window.location.origin + '/resolve/';
                 if (libCode !== '') {
                     baseResolver = baseResolver + libCode + '/';
-                };
+		};
+		get360Link(baseResolver + '?' + ourl)
                 //Should add logic to detect when link resolver fails.
-                jsonFetch(baseResolver + '?' + ourl + '&output=json&callback=?', {},process360LinkHoldings);
-            };
+                //jsonFetch(baseResolver + '?' + ourl + '&output=json&callback=?', {}, process360LinkHoldings);
+	    };
 
-	    function process360LinkHoldings(holdings) {
-		console.log(holdings)
-		var held = false;
-		if (holdings.url != undefined) {
-                        //add library
-			link['library'] = holdings.library;
-			console.log(holdings.url);
-                        $('#links').html($('#linkTemplate').tmpl(holdings.url));
+	    function get360Link(ourl) {
+		//error checking would be better
+		$.getJSON(ourl, function(data) {
+		    if ((data.url != undefined) && (data.url != null)) {
+			$('#links').html($('#linkTemplate').tmpl(data));
                         $('#spinner').hide();
-                        held = true;
-                };
-                //not held
-                if (held == false) {
-                    $('#links').html($('#noHoldingsTemplate').tmpl(holdings));
-                    $('#spinner').hide();
-                };
-                
-                return;
-            };
-
-
-            function jsonFetch(url, data, callback) {
-                $('#spinner').show();
-                $.ajax({
-                  url: url,
-                  dataType: 'json',
-                  data: data,
-                  success: callback
-                });
-            };
+		    } else {
+			$('#links').html($('#noHoldingsTemplate').tmpl(data));
+		    };
+		    $('#spinner').hide()
+		});
+	    };
 
         </script>
 
