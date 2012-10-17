@@ -18,39 +18,35 @@ def fetch_cite():
         return jsonify(results)
 
 
-@app.route('/resolve/<key>', methods=['GET'])
+@app.route('/resolve/<key>/', methods=['GET'])
 @app.route('/resolve/', methods=['GET'])
-def resolve():
+def resolve(key=None):
     from py360link import get_sersol_data, Resolved
     from py360link.link360 import Link360Exception
     query = request.query_string
-    try:
-	key = key
-    except UnboundLocalError:
-	key = default_sersol_key
-    if not key:
-	key = default_sersol_key
+    sersol_key = request.view_args.get('key', default_sersol_key)
+    #Setup some defaults for the json response.
     d = {}
-    d['key'] = key
+    d['key'] = sersol_key
     d['library'] = None 
-    #d['args'] = request.args
-    #d['sersol'] = sersol
+    d['error'] = False
     d['url'] = None
     d['provider'] = None
-    sersol = get_sersol_data(query, key=key, timeout=10)
+    sersol = get_sersol_data(query, key=sersol_key, timeout=10)
     try:
-	resolved = Resolved(sersol)
-	d['library'] = resolved.library
-	groups = resolved.link_groups
+        resolved = Resolved(sersol)
+        d['library'] = resolved.library
+        groups = resolved.link_groups
+        #Get the first link to a full text source
         for grp, link in enumerate(groups):
-	    article = link['url'].get('article')
-	    if article:
-		d['url'] = article
-		d['provider'] = groups[grp]['holdingData']['providerName']
-		break
+            article = link['url'].get('article')
+            if article:
+                d['url'] = article
+                d['provider'] = groups[grp]['holdingData']['providerName']
+                break
     except Link360Exception:
-	print '#ERRROR 360Link %s' % query
-	pass
+        d['error'] = True
+        print '#ERRROR 360Link %s' % query
     d['query'] = query
     return jsonify(d)
 
