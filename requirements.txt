@@ -1,9 +1,9 @@
-Flask==0.9
-Jinja2==2.6
-Werkzeug==0.8.3
-distribute==0.6.28
-requests==0.14.1
-wsgiref==0.1.2
-gunicorn==0.14.6
+Flask
+Jinja2
+Werkzeug
+distribute
+requests
+wsgiref
+gunicorn
 git+git://github.com/lawlesst/py360link.git
-lxml==3.0.1
+lxml
