@@ -23,7 +23,9 @@ def fetch_cite():
 def resolve(key=None):
     from py360link import get_sersol_data, Resolved
     from py360link.link360 import Link360Exception
-    query = request.query_string
+    raw_query = request.query_string
+    #remove http prefix from doi
+    query = raw_query.replace('http://dx.doi.org/', '')
     sersol_key = request.view_args.get('key', default_sersol_key)
     #Setup some defaults for the json response.
     d = {}
