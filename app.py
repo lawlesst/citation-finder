@@ -52,11 +52,15 @@ def resolve(key=None):
     d['query'] = query
     return jsonify(d)
 
+
 @app.route('/<library>/')
 @app.route('/')
 def index(library=None):
-    return render_template('index.html', library=library)
-
+    ctx = dict(
+        ga_tracking_code=os.getenv('GA_TRACKING_CODE'),
+        library=library,
+    )
+    return render_template('index.html', **ctx)
 
 
 if __name__ == '__main__':
