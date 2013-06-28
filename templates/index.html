@@ -134,13 +134,13 @@
                 <ul>
                 <!---<li><a href="http://worldcatlibraries.org/registry/gateway?${coins}">Find via Worldcat</a></li>-->
                 <li>
-                    Google Scholar: <a href="http://scholar.google.com/scholar?cites=http://dx.doi.org/${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?q=related:http://dx.doi.org/${doi}">related articles</a>
+                    Google Scholar: <a href="http://scholar.google.com/scholar?cites=${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?q=related:${doi}">related articles</a>
                 </li>
                 <li>
                     <a title="Add this article to your Mendeley library" href="http://www.mendeley.com/import/?doi=${doi}"><img src="http://www.mendeley.com/graphics/mendeley.png"/></a>&nbsp;&nbsp;
                     <a title="Add this article to your RefWorks library" href=" http://www.refworks.com/express/expressimport.asp?${coins}"><img src="http://www.refworks.com/favicon.ico"/></a>
                 </li>
-                <li><a href="http://dx.doi.org/${doi}">http://dx.doi.org/${doi}</a></li>
+                <li><a href="${doi}">${doi}</a></li>
                 </ul>
                 <span class="Z3988" title="${coins}"></span>
         </script>
