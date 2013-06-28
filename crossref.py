@@ -1,23 +1,24 @@
-# -*- coding: utf8 -*- 
+# -*- coding: utf8 -*-
 
 """
 Work with the crossref APIs.
 """
-
+from curses import ascii
 from pprint import pprint
 import json
 import requests
 
 def scrub(value):
     """
-    Clean up the incoming queries to remove unfriendly 
+    Clean up the incoming queries to remove unfriendly
     characters that may come from copy and pasted citations.
     """
-    from curses import ascii
     if not value:
         return
     n = ''.join([c for c in value.strip() if not ascii.isctrl(c)])
-    return n
+    #Strip newline or \f characters.
+    n2 = n.replace('\n', '').replace('\f', '')
+    return n2
 
 
 def fetch_links(query):
@@ -38,13 +39,14 @@ def fetch_links(query):
     if len(found) == 0:
         cite_meta = []
     else:
-        #Lookup the DOIs and get metadata for the located citations.  
+        #Lookup the DOIs and get metadata for the located citations.
         item = found[0]
         doi = item.get('doi')
         meta = fetch_doi(doi)
         cite_meta = [meta]
     out = dict(status=ok, cites=cite_meta)
     return out
+
 
 def fetch_doi(doi):
     cr = 'http://search.labs.crossref.org/dois'
@@ -55,7 +57,7 @@ def fetch_doi(doi):
     meta = json.loads(resp.content)
     #Some doi lookups are failing.  Not sure why.
     #We could also use the CrossRef OpenURL end point to find these:
-    #http://www.crossref.org/openurl/?id=doi:10.1016/0166-0934(91)90005-K&noredirect=true&pid=KEY  
+    #http://www.crossref.org/openurl/?id=doi:10.1016/0166-0934(91)90005-K&noredirect=true&pid=KEY
     try:
         first = meta[0]
         return first
