@@ -6,19 +6,28 @@ Work with the crossref APIs.
 from curses import ascii
 from pprint import pprint
 import json
+import string
+
 import requests
+
+punctuation = set(string.punctuation)
+
 
 def scrub(value):
     """
     Clean up the incoming queries to remove unfriendly
     characters that may come from copy and pasted citations.
+
+    Also remove all punctuation from text.
+    
     """
     if not value:
         return
     n = ''.join([c for c in value.strip() if not ascii.isctrl(c)])
     #Strip newline or \f characters.
     n2 = n.replace('\n', '').replace('\f', '')
-    return n2
+    cleaned = ''.join(ch for ch in n2 if ch not in punctuation)
+    return cleaned
 
 
 def fetch_links(query):
