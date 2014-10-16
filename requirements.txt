@@ -5,5 +5,4 @@ distribute
 requests
 wsgiref
 gunicorn
-git+git://github.com/lawlesst/py360link.git
-lxml
+git+git://github.com/lawlesst/py360link.git@dev

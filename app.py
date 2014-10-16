@@ -21,8 +21,7 @@ def fetch_cite():
 @app.route('/resolve/<key>/', methods=['GET'])
 @app.route('/resolve/', methods=['GET'])
 def resolve(key=None):
-    from py360link import get_sersol_data, Resolved
-    from py360link.link360 import Link360Exception
+    import py360link
     raw_query = request.query_string
     #remove http prefix from doi
     query = raw_query.replace('http://dx.doi.org/', '')
@@ -30,23 +29,23 @@ def resolve(key=None):
     #Setup some defaults for the json response.
     d = {}
     d['key'] = sersol_key
-    d['library'] = None 
+    d['library'] = None
     d['error'] = False
     d['url'] = None
     d['provider'] = None
-    sersol = get_sersol_data(query, key=sersol_key, timeout=10)
+    sersol = py360link.get(query, key=sersol_key, timeout=10)
+    resolved = sersol.json()
+    #import ipdb; ipdb.set_trace()
     try:
-        resolved = Resolved(sersol)
-        d['library'] = resolved.library
-        groups = resolved.link_groups
+        d['library'] = resolved['metadata']['library']
+        groups = resolved['records'][0]['links']
         #Get the first link to a full text source
         for grp, link in enumerate(groups):
-            article = link['url'].get('article')
-            if article:
-                d['url'] = article
-                d['provider'] = groups[grp]['holdingData']['providerName']
+            if link['type'] == 'article':
+                d['url'] = link['url']
+                d['provider'] = link['anchor']
                 break
-    except Link360Exception:
+    except IndexError:
         d['error'] = True
         print '#ERRROR 360Link %s' % query
     d['query'] = query
