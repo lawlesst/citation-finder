@@ -19,7 +19,7 @@ def scrub(value):
     characters that may come from copy and pasted citations.
 
     Also remove all punctuation from text.
-    
+
     """
     if not value:
         return
@@ -31,12 +31,12 @@ def scrub(value):
 
 
 def fetch_links(query):
-    cr = 'http://search.labs.crossref.org/links'
+    cr = 'http://search.crossref.org/links'
     #Scrub the citation query.
     cleaned = scrub(query)
     #Turn query into a list because the API is expecting a list.
     citations = [cleaned]
-    resp = requests.post(cr, data=json.dumps(citations))
+    resp = requests.post(cr, data=json.dumps(citations), headers={'Content-Type': 'application/json'})
     if resp.status_code != 200:
         print "#ERROR citation lookup failed %s." % cleaned
         raise Exception("Crossref request failed")
