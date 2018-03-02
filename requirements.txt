@@ -1,7 +1,4 @@
 Flask
-Jinja2
-Werkzeug
 requests
-wsgiref
 gunicorn
 git+git://github.com/lawlesst/py360link.git@dev

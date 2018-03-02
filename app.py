@@ -6,6 +6,8 @@ from flask import render_template
 
 from crossref import fetch_links
 
+import py360link
+
 default_sersol_key = 'rl3tp7zf5x'
 
 app = Flask(__name__)
@@ -21,7 +23,6 @@ def fetch_cite():
 @app.route('/resolve/<key>/', methods=['GET'])
 @app.route('/resolve/', methods=['GET'])
 def resolve(key=None):
-    import py360link
     raw_query = request.query_string
     #remove http prefix from doi
     query = raw_query.replace('http://dx.doi.org/', '')
@@ -35,10 +36,11 @@ def resolve(key=None):
     d['provider'] = None
     sersol = py360link.get(query, key=sersol_key, timeout=10)
     resolved = sersol.json()
-    #import ipdb; ipdb.set_trace()
     try:
         d['library'] = resolved['metadata']['library']
         groups = resolved['records'][0]['links']
+        if groups is None:
+            groups = []
         #Get the first link to a full text source
         for grp, link in enumerate(groups):
             if link['type'] == 'article':
@@ -47,7 +49,7 @@ def resolve(key=None):
                 break
     except IndexError:
         d['error'] = True
-        print '#ERRROR 360Link %s' % query
+        print('#ERRROR 360Link %s' % query)
     d['query'] = query
     return jsonify(d)
 

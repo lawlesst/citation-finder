@@ -10,16 +10,18 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
-        <link rel="stylesheet" href="http://s3.amazonaws.com/static-heroku-360link/css/normalize.min.css">
-        <link rel="stylesheet" href="http://s3.amazonaws.com/static-heroku-360link/css/main.css">
-
-        <script src="http://s3.amazonaws.com/static-heroku-360link/js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
-
         <style type="text/css">
         body {
-            font-family:'Gill Sans std','Gill Sans MT','Goudy Bookletter 1911','Linux Libertine O','Liberation Serif',Candara,serif;
-            font-size: 18px;
-            line-height: 1.4em;
+            font-family: 'Droid Sans', sans-serif;
+        }
+        h1.title {
+            margin-left: 5em;
+            color: #48535f;
+        }
+        .main-container {
+            width: 70%;
+            margin-left: auto;
+            margin-right: auto;
         }
          input#cite {
             width: 30em;
@@ -31,49 +33,42 @@
          .not-found em {
             padding: 1em;
          }
-         .main-container {
-         }
-
          #library-code {
             display: none;
          }
-         .intro {
-         }
-         .header-container,
-            .main aside {
-                -webkit-box-shadow: none;
-                   -moz-box-shadow: none;
-                        box-shadow: none;
-            }
-        .main {
-            .padding: 0;
-        }
-        h5 {
-            margin: 0em;
-        }
         #disqus_thread {
             margin-top: 6em;
         }
 
-        #spinner {
+/*        #spinner {
             display: none;
             padding: 2em;
+        }*/
+
+        /*https://codepen.io/mandelid/pen/vwKoe*/
+        #spinner {
+          display: none;
+          width: 50px;
+          height: 50px;
+          border: 3px solid rgba(255,255,255,.3);
+          border-radius: 50%;
+          border-top-color: #fff;
+          animation: spin 1s ease-in-out infinite;
+          -webkit-animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+          to { -webkit-transform: rotate(360deg); }
+        }
+        @-webkit-keyframes spin {
+          to { -webkit-transform: rotate(360deg); }
         }
         </style>
     </head>
     <body>
-        <!--[if lt IE 7]>
-            <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
-        <![endif]-->
-
-        <div class="header-container">
-            <header class="wrapper clearfix">
-                <h1 class="title">Citation finder</h1>
-            </header>
-        </div>
+        <h1 class="title">Citation finder</h1>
 
         <div class="main-container">
-            <div class="main wrapper clearfix">
                 <article>
                     </section>
                     <section id="cites">
@@ -81,68 +76,31 @@
                     <section id="links">
                     </section>
                     <section>
-                        <div id="spinner">
-                                <img src="https://library.brown.edu/find/interface/themes/brown/images/ajax_loading.gif" alt="Initially hidden spinner" />
-                        </div>
+                        <div id="spinner"></div>
                     </section>
                     <section>
                         <form id="cite-box">
                             <textarea rows="7" cols="70" id="text-box"></textarea>
                         </form>
-                        <p class="intro">Paste a citation in the box above.  A query will be made to CrossRef to attempt to find a DOI for the citation.  A second query will be made to a link resolver to attempt to find a full text link for the citation.  Clear the box or paste a new citation to start over.  This demo uses the <a href="http://search.labs.crossref.org/help/api">CrossRef metadata search.</p>
+                        <p class="intro">Paste a citation in the box above.  A query will be made to CrossRef to attempt to find a DOI for the citation.  A second query will be made to a link resolver to attempt to find a full text link for the citation.  Clear the box or paste a new citation to start over.  This demo uses the <a href="http://search.crossref.org/">CrossRef metadata search.</p>
                     </section>
-                    <section>
-                        <div id="disqus_thread"></div>
-                        <script type="text/javascript">
-                            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-                            var disqus_shortname = 'citationfinderdemo'; // required: replace example with your forum shortname
-
-                            /* * * DON'T EDIT BELOW THIS LINE * * */
-                            (function() {
-                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                               (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                            })();
-                        </script>
-                        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-                        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-                    </section>
-                    <footer>
-                    </footer>
                 </article>
                 {% if library %}
                 <span id="library-code">{{ library }}</span>
                 {% endif %}
                 <a href="https://github.com/lawlesst/citation-finder"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub"></a>
-            </div> <!-- #main -->
         </div> <!-- #main-container -->
 
-        <div class="footer-container">
-            <footer class="wrapper">
-            </footer>
-        </div>
-
-        <script type="text/javascript" src="http://library.brown.edu/easyarticle/static/delivery/js/json2.js"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-        <script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
-        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.2.min.js"><\/script>')</script>
-        <script src="http://s3.amazonaws.com/static-heroku-360link/js/main.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
         <!-- jQuery templates -->
         {% raw %}
         <script id="citationsTemplate" type="text/x-jQuery-tmpl">
-                <p id="found-citation">{{html fullCitation}}</p>
+                <p id="found-citation">${title[0]} - ${created['date-parts'][0][0]}</p>
+                <p></p>
                 <ul>
-                <!---<li><a href="http://worldcatlibraries.org/registry/gateway?${coins}">Find via Worldcat</a></li>-->
-                <li>
-                    Google Scholar: <a href="http://scholar.google.com/scholar?cites=${doi}">citing articles</a>&nbsp;-&nbsp;<a href="http://scholar.google.com/scholar?q=related:${doi}">related articles</a>
-                </li>
-                <li>
-                    <a title="Add this article to your Mendeley library" href="http://www.mendeley.com/import/?doi=${doi}"><img src="http://www.mendeley.com/graphics/mendeley.png"/></a>&nbsp;&nbsp;
-                    <a title="Add this article to your RefWorks library" href=" http://www.refworks.com/express/expressimport.asp?${coins}"><img src="http://www.refworks.com/favicon.ico"/></a>
-                </li>
-                <li><a href="${doi}">${doi}</a></li>
+                    <li><a href="${doi}">${DOI}</a></li>
                 </ul>
-                <span class="Z3988" title="${coins}"></span>
         </script>
 
         <script id="notFoundTemplate" type="text/x-jQuery-tmpl">
@@ -188,13 +146,13 @@
                 //console.log(query + '--' + queryWordLength);
                // console.log(query.length);
                 //Don't execute blank queries or those less than n characters.
-                //CrossRef also wants a minimum of three words in the query. 
+                //CrossRef also wants a minimum of three words in the query.
                 if ((query == '') || (query.length < 25) || (queryWordLength < 3)) {
 
                 } else {
                     setTimeout(findDOI(query), 2000);
                 };
-            }); 
+            });
 
 
             function findDOI(cite) {
@@ -205,31 +163,28 @@
                 var jqxhr = $.post("/fetch-cite", cite, function() {
                   //console.debug(this);
                 })
-                .success(function(data) 
-                    { 
-                        //console.debug(data.cites);
-                        //console.debug(data.cites.length);
-                        //console.debug(data.cites[0]);
+                .success(function(data)
+                    {
                         //not found
                         if ((data.cites.length == undefined) || (data.cites.length == 0)) {
                             //render not found
                             $('#cites').html($('#notFoundTemplate').tmpl({'cite':cite}));
                             $('#spinner').toggle();
                         } else {
-                            $.each(data.cites, function(num, link) { 
-                              if (link.doi == undefined) {
+                            $.each(data.cites, function(num, link) {
+                              if (link.DOI == undefined) {
                                   $('#cites').html($('#notFoundTemplate').tmpl({'cite':cite}));
                                   $('#spinner').toggle();
                                   return false;
                               } else {
                                   $('#cites').html($('#citationsTemplate').tmpl(data.cites));
-                                  getElectronicHoldings(link.doi);
+                                  getElectronicHoldings(link.DOI);
                               };
                             });
                         };
                     }
                 )
-                .error(function() { 
+                .error(function() {
                     $('#cites').html($('#lookupErrorTemplate').tmpl());
                     $('#spinner').toggle();
                 })
@@ -253,42 +208,29 @@
             function getElectronicHoldings(doi) {
                 var ourl = 'doi=' + doi;
                 var libCode = $('#library-code').text();
-		//var baseResolver = 'http://damp-tor-3124.herokuapp.com/';
-		var baseResolver = window.location.origin + '/resolve/';
-                if (libCode !== '') {
-                    baseResolver = baseResolver + libCode + '/';
-		};
+        		//var baseResolver = 'http://damp-tor-3124.herokuapp.com/';
+        		var baseResolver = window.location.origin + '/resolve/';
+                        if (libCode !== '') {
+                            baseResolver = baseResolver + libCode + '/';
+        	};
 		get360Link(baseResolver + '?' + ourl)
                 //Should add logic to detect when link resolver fails.
                 //jsonFetch(baseResolver + '?' + ourl + '&output=json&callback=?', {}, process360LinkHoldings);
 	    };
 
 	    function get360Link(ourl) {
-		//error checking would be better
-		$.getJSON(ourl, function(data) {
-		    if ((data.url != undefined) && (data.url != null)) {
-			$('#links').html($('#linkTemplate').tmpl(data));
-                        $('#spinner').hide();
-		    } else {
-			$('#links').html($('#noHoldingsTemplate').tmpl(data));
-		    };
-		    $('#spinner').hide()
-		});
+    		//error checking would be better
+    		$.getJSON(ourl, function(data) {
+    		    if ((data.url != undefined) && (data.url != null)) {
+    			$('#links').html($('#linkTemplate').tmpl(data));
+                            $('#spinner').hide();
+    		    } else {
+    			$('#links').html($('#noHoldingsTemplate').tmpl(data));
+    		    };
+    		    $('#spinner').hide()
+    		});
 	    };
 
         </script>
-    <script type="text/javascript">
-
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', '{{ga_tracking_code}}']);
-      _gaq.push(['_trackPageview']);
-
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-
-    </script>
     </body>
 </html>

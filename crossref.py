@@ -12,6 +12,8 @@ import requests
 
 punctuation = set(string.punctuation)
 
+API_URL = 'https://api.crossref.org/works'
+
 
 def scrub(value):
     """
@@ -31,54 +33,51 @@ def scrub(value):
 
 
 def fetch_links(query):
-    cr = 'http://search.crossref.org/links'
     #Scrub the citation query.
     cleaned = scrub(query)
     #Turn query into a list because the API is expecting a list.
-    citations = [cleaned]
-    resp = requests.post(cr, data=json.dumps(citations), headers={'Content-Type': 'application/json'})
+    #citations = [cleaned]
+    resp = requests.get(API_URL, params={'query': cleaned}, headers={'Content-Type': 'application/json'})
     if resp.status_code != 200:
-        print "#ERROR citation lookup failed %s." % cleaned
+        print("#ERROR citation lookup failed %s." % cleaned)
         raise Exception("Crossref request failed")
-    match_dict = json.loads(resp.content)
-    print "#INFO %s." % match_dict
-    results = match_dict.get('results')
-    ok = match_dict.get('query_ok')
-    found = [r for r in results if r.get('match') is True]
+    details = resp.json()
+    found = details.get('message', {}).get('items', [])
     if len(found) == 0:
         cite_meta = []
+        ok = False
     else:
         #Lookup the DOIs and get metadata for the located citations.
         item = found[0]
-        doi = item.get('doi')
+        doi = item.get('DOI')
         meta = fetch_doi(doi)
         cite_meta = [meta]
+        ok = True
     out = dict(status=ok, cites=cite_meta)
     return out
 
 
 def fetch_doi(doi):
-    cr = 'http://search.labs.crossref.org/dois'
     #replace / in dois
-    resp = requests.get(cr + '?q=' + doi)
+    resp = requests.get(API_URL + "/doi/" + doi)
     if resp.status_code != 200:
         raise Exception("Crossref request failed.  Error code " + str(resp.status_code))
-    meta = json.loads(resp.content)
+    meta = resp.json()
     #Some doi lookups are failing.  Not sure why.
     #We could also use the CrossRef OpenURL end point to find these:
     #http://www.crossref.org/openurl/?id=doi:10.1016/0166-0934(91)90005-K&noredirect=true&pid=KEY
     try:
-        first = meta[0]
+        first = meta['message']
         return first
     except IndexError:
-        print "#ERROR DOI lookup failed for %s." % doi
+        print("#ERROR DOI lookup failed for %s." % doi)
         return {}
 
 if __name__ == "__main__":
     d = '10.1021/mp050023q'
     meta = fetch_doi(d)
-    print meta.get('doi') == d
-    print meta.get('title').rfind('Drugs') > 0
+    print(meta.get('doi') == d)
+    print(meta.get('title')[0].rfind('Drugs') > 0)
 
     cite = """
 Dendrimers as drugs: discovery and preclinical and clinical development of dendrimer-based microbicides for HIV and STI prevention
